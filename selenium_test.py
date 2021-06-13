@@ -7,18 +7,19 @@ from selenium.webdriver.common.by import By
 import threading
 import time
 import copy
+import sys
 
 # リクエスト数
-NUM_REQUEST = 10
-# 現在使っておらず
-random_talk = []
+NUM_REQUEST = int(sys.argv[1]) if sys.argv[1] else 1
 # URL
-url = "http://localhost:8080"
+url = sys.argv[2] if sys.argv[2] else "http://localhost:8080"
 
 # テストクラス
 class RequestTest():
-    def __init__(self):
-        pass
+
+    def __init__(self, id):
+        self.id = id
+
     def make_driver(self):
         # 流しっぱなし
         while True:
@@ -29,13 +30,16 @@ class RequestTest():
             # iframe使うような奴は遷移させる
             driver.switch_to_frame(iframe)
             WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.TAG_NAME, 'a'))).click()
-                time.sleep(10)
+            time.sleep(10)
             driver.quit()
             print('stop')
+
 
 if __name__ == "__main__":
     list_class = []
     for d in range(NUM_REQUEST):
-        list_class.append(RequestTest())
+        list_class.append(
+            RequestTest(d)
+        )
         thread = threading.Thread(target=list_class[d].make_driver)
         thread.start()
